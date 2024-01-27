@@ -7,7 +7,6 @@ on:
 env:
   default_version_suffix: "preview-1"
   default_version: "1.0.0"
-  combined_version: "${{ env.default_version }}-${{ env.default_version_suffix }}"
 
 jobs:
   build:
@@ -20,9 +19,7 @@ jobs:
         run: $Version="${{ env.default_version }}-${{ env.default_version_suffix }}"
 
       - name: Detect Version
-        run: |
-          echo $Version
-          echo ${{ env.combined_version }}
+        run: echo $Version
 
       - name: Split default Version
         uses: winterjung/split@v2
