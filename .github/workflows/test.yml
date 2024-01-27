@@ -1,0 +1,51 @@
+name: Test
+
+on:
+  push:
+    branches: [ "main" ]
+
+env:
+  default_version_suffix: "preview-1"
+  default_version: "1.0.0"
+  combined_version: "${{ env.default_version }}-${{ env.default_version_suffix }}"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      
+      - name: Define Version
+        run: $Version="${{ env.default_version }}-${{ env.default_version_suffix }}"
+
+      - name: Detect Version
+        run: |
+          echo $Version
+          echo ${{ env.combined_version }}
+
+      - name: Split default Version
+        uses: winterjung/split@v2
+        id: version_split
+        with:
+          msg: $Version
+          separator: '.'
+
+      - name: Split default Version
+        uses: winterjung/split@v2
+        id: version_split_preview
+        with:
+          msg: steps.version_split.outputs._2
+          separator: '-'
+
+      - name: Print splits
+        run: |
+          echo Version Splits by .
+          echo ${{ steps.version_split.outputs._0 }}
+          echo ${{ steps.version_split.outputs._1 }}
+          echo ${{ steps.version_split.outputs._2 }}
+          echo \r\n
+          echo Preview Splits by -
+          echo ${{ steps.version_split_preview.outputs._0 }}
+          echo ${{ steps.version_split_preview.outputs._1 }}
+          echo ${{ steps.version_split_preview.outputs._2 }}
