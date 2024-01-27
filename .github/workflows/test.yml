@@ -19,20 +19,20 @@ jobs:
         run: Version="${{ env.default_version }}-${{ env.default_version_suffix }}"
 
       - name: Detect Version
-        run: echo $Version
+        run: echo "$Version"
 
       - name: Split default Version
         uses: winterjung/split@v2
         id: version_split
         with:
-          msg: $Version
+          msg: ${{ $Version }}
           separator: '.'
 
       - name: Split default Version
         uses: winterjung/split@v2
         id: version_split_preview
         with:
-          msg: steps.version_split.outputs._2
+          msg: ${{ steps.version_split.outputs._2 }}
           separator: '-'
 
       - name: Print splits
