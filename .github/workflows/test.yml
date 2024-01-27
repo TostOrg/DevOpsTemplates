@@ -14,34 +14,35 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
-      - name: Check Version on branch
-        run: echo Latest_Tag=$(/usr/bin/git tag --list | tail -1) >> $GITHUB_ENV
-
-      - name: Compute Branch Tag into Version
-        if: ${{ env.Latest_Tag == '' }}
-        run: echo Latest_Tag=${{ env.default_version }}-${{ env.default_version_suffix }} >> $GITHUB_ENV
+      - name: 'Get Previous tag'
+        id: previoustag
+        uses: "WyriHaximus/github-action-get-previous-tag@v1"
+        with:
+          fallback: ${{ env.default_version }}-${{ env.default_version_suffix }}
 
       - name: Split Version
         uses: winterjung/split@v2
         id: version_split
         with:
-          msg: ${{ env.Latest_Tag }}
+          msg: ${{ steps.previoustag.outputs.tag }}
           separator: '.'
 
-      - name: Split Version
+      - name: Split Patch Version
         uses: winterjung/split@v2
         id: version_split_preview
         with:
           msg: ${{ steps.version_split.outputs._2 }}
           separator: '-'
 
-      - name: Push new Tag to origin
-        run: |
-          "/usr/bin/git tag" \
-          "${{ steps.version_split.outputs._0 }}." \
+      - name: Combine new version
+        run: NewVersion="${{ steps.version_split.outputs._0 }}." \
           "${{ steps.version_split.outputs._1 }}." \
           "${{ steps.version_split_preview.outputs._0 }}-" \
           "${{ steps.version_split_preview.outputs._1 }}-" \
-          "$((${{ steps.version_split_preview.outputs._2 }} + 1))"
-          /usr/bin/git push origin --tags
+          "$((${{ steps.version_split_preview.outputs._2 }} + 1))" >> $GITHUB_ENV
+
+      - name: Echo Step
+        run: echo $NewVersion
