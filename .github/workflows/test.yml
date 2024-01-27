@@ -16,7 +16,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Check Version on branch
-        run: echo Latest_Tag=$(git tag --list | tail -1) >> $GITHUB_ENV
+        run: echo Latest_Tag=$(/usr/bin/git tag --list | tail -1) >> $GITHUB_ENV
 
       - name: Compute Branch Tag into Version
         if: ${{ env.Latest_Tag == '' }}
@@ -38,10 +38,10 @@ jobs:
 
       - name: Push new Tag to origin
         run: |
-          "git tag" \
+          "/usr/bin/git tag" \
           "${{ steps.version_split.outputs._0 }}." \
           "${{ steps.version_split.outputs._1 }}." \
           "${{ steps.version_split_preview.outputs._0 }}-" \
           "${{ steps.version_split_preview.outputs._1 }}-" \
           "$((${{ steps.version_split_preview.outputs._2 }} + 1))"
-          git push origin --tags
+          /usr/bin/git push origin --tags
