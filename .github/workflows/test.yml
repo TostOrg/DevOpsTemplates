@@ -7,7 +7,6 @@ on:
 env:
   default_version_suffix: "preview-1"
   default_version: "1.0.0"
-  combined_version: ${{ env.default_version }}-${{ env.default_version_suffix }}
 
 jobs:
   build:
