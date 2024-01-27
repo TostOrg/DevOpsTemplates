@@ -17,16 +17,16 @@ jobs:
         uses: actions/checkout@v3
       
       - name: Define Version
-        run: Version=${{ env.combined_version }}
+        run: echo Version='${{ env.default_version }}'-'${{ env.default_version_suffix }}' >> $GITHUB_ENV
 
       - name: Detect Version
-        run: echo "$Version"
+        run: echo ${{ env.Version }}
 
       - name: Split default Version
         uses: winterjung/split@v2
         id: version_split
         with:
-          msg: ${{ env.combined_version }}
+          msg: ${{ env.Version }}
           separator: '.'
 
       - name: Split default Version
