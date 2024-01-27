@@ -1,0 +1,66 @@
+name: .NET
+
+on:
+  #push:
+  #  branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  default_version: "1.0.0-preview-1"
+  host: self-hosted
+  dotnet_version: 8.x
+
+jobs:
+  build:
+
+    runs-on: ${{ env.host }}
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: ${{ env.dotnet_version }}
+    - name: Set VERSION variable
+      run: $VERSION="${{  github.ref_name }}"
+    
+    - name: Checking VERSION variable
+      if: ${{ $Version == '' }}
+      run: |
+        $Version=${{ env.default_version }}
+
+    - name: Splitting VERSION into components for increment
+      if: ${{ !($Version == '') }}
+      uses: winterjung/split@v2
+      id: version_split
+      with:
+        msg: $Version
+        separator: '.'
+
+    - name: Splitting VERSION into components for increment
+      if: ${{ !($Version == '') }}
+      uses: winterjung/split@v2
+      id: version_split_preview
+      with:
+        msg: ${{ steps.version_split.outputs._2 }}
+        separator: '-'
+
+    - name: Incrementing VERSION
+      if: ${{ !($Version == '') }}
+      run: |
+        echo "Incrementing Version"
+        $Version="${{ steps.version_split.outputs._0 }}.${{ steps.version_split.outputs._1 }}.${{ steps.version_split_preview.outputs._0 }}-${{ steps.version_split_preview.outputs._1 }}-${{ echo $((steps.version_split_preview.outputs._2 + 1)) }}"
+        echo "Version is $Version"
+        
+    - name: Restore dependencies
+      run: dotnet restore --no-cache
+    - name: Build
+      run: dotnet build --no-restore --configuration Release -p:Version=${VERSION}
+    - name: Test
+      run: dotnet test --no-build --configuration Release --verbosity normal -p:Version=${VERSION}
+    - name: Pack
+      run: dotnet pack --no-build --configuration Release --include-symbols --include-source -p:SymbolPackageFormat=snupkg -p:Version=${VERSION}
+    - name: Push
+      run: dotnet nuget push **/*.snupkg -s ${{ secrets.NUGET_SERVER }} -k ${{ secrets.NUGET_TOKEN }} --no-service-endpoint
