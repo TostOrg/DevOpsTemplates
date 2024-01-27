@@ -14,12 +14,17 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      
-      - name: Define Version
-        run: echo Version='${{ env.default_version }}'-'${{ env.default_version_suffix }}' >> $GITHUB_ENV
 
-      - name: Detect Version
-        run: echo ${{ env.Version }}
+      - name: Check Version on branch
+        run: echo Latest_Tag=$(git tag --list | tail -1) >> $GITHUB_ENV
+
+      - name: Compute Branch Tag into Version
+        if: ${{ env.Latest_Tag == '' }}
+        run: |
+          echo No tags available. Creating first tag '${{ env.default_version }}'-'${{ env.default_version_suffix }}'
+          git tag '${{ env.default_version }}'-'${{ env.default_version_suffix }}'
+          git push origin --tags
+          echo Latest_Tag=$(git tag --list | tail -1) >> $GITHUB_ENV
 
       - name: Split default Version
         uses: winterjung/split@v2
@@ -35,22 +40,11 @@ jobs:
           msg: ${{ steps.version_split.outputs._2 }}
           separator: '-'
 
-      - name: Print splits
+      - name: Push new Tag to origin
         run: |
-          echo Version Splits by .
-          echo ${{ steps.version_split.outputs._0 }}
-          echo ${{ steps.version_split.outputs._1 }}
-          echo ${{ steps.version_split.outputs._2 }}
-          echo 
-          echo Preview Splits by -
-          echo ${{ steps.version_split_preview.outputs._0 }}
-          echo ${{ steps.version_split_preview.outputs._1 }}
-          echo ${{ steps.version_split_preview.outputs._2 }}
-          echo 
-          echo Current Version: ${{ env.Version }}
-          echo New Version: \
-             ${{ steps.version_split.outputs._0 }}.\
-             ${{ steps.version_split.outputs._1 }}.\
-             ${{ steps.version_split_preview.outputs._0 }}-\
-             ${{ steps.version_split_preview.outputs._1 }}-\
-             $((${{ steps.version_split_preview.outputs._2 }} + 1))
+          "git tag" \
+          "${{ steps.version_split.outputs._0 }}." \
+          "${{ steps.version_split.outputs._1 }}." \
+          "${{ steps.version_split_preview.outputs._0 }}-" \
+          "${{ steps.version_split_preview.outputs._1 }}-" \
+          "$((${{ steps.version_split_preview.outputs._2 }} + 1))"
