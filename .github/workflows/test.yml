@@ -38,7 +38,7 @@ jobs:
           separator: '-'
 
       - name: Combine new version
-        run: echo "NewVersion=${{ steps.version_split.outputs._0 }}.${{ steps.version_split.outputs._1 }}.${{ steps.version_split_preview.outputs._0 }}-${{ steps.version_split_preview.outputs._1 }}-$((${{ steps.version_split_preview.outputs._2 }} + 1))" >> $GITHUB_ENV
+        run: echo "newVersion=${{ steps.version_split.outputs._0 }}.${{ steps.version_split.outputs._1 }}.${{ steps.version_split_preview.outputs._0 }}-${{ steps.version_split_preview.outputs._1 }}-$((${{ steps.version_split_preview.outputs._2 }} + 1))" >> $GITHUB_ENV
 
       - name: Echo Step
-        run: echo ${{ env.$NewVersion }}
+        run: echo ${{ env.newVersion }}
