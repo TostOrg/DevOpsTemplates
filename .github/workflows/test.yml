@@ -5,7 +5,7 @@ on:
     branches: [ "main" ]
 
 env:
-  default_version_suffix: "preview-1"
+  default_version_suffix: "preview-0"
   default_version: "1.0.0"
 
 jobs:
@@ -20,20 +20,16 @@ jobs:
 
       - name: Compute Branch Tag into Version
         if: ${{ env.Latest_Tag == '' }}
-        run: |
-          echo No tags available. Creating first tag ${{ env.default_version }}-${{ env.default_version_suffix }}
-          git tag ${{ env.default_version }}-${{ env.default_version_suffix }}
-          git push origin --tags
-          echo Latest_Tag=$(git tag --list | tail -1) >> $GITHUB_ENV
+        run: echo Latest_Tag=${{ env.default_version }}-${{ env.default_version_suffix }} >> $GITHUB_ENV
 
-      - name: Split default Version
+      - name: Split Version
         uses: winterjung/split@v2
         id: version_split
         with:
-          msg: ${{ env.Version }}
+          msg: ${{ env.Latest_Tag }}
           separator: '.'
 
-      - name: Split default Version
+      - name: Split Version
         uses: winterjung/split@v2
         id: version_split_preview
         with:
@@ -48,3 +44,4 @@ jobs:
           "${{ steps.version_split_preview.outputs._0 }}-" \
           "${{ steps.version_split_preview.outputs._1 }}-" \
           "$((${{ steps.version_split_preview.outputs._2 }} + 1))"
+          git push origin --tags
