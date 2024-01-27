@@ -49,8 +49,8 @@ jobs:
           echo 
           echo Current Version: ${{ env.Version }}
           echo New Version: \
-             ${{ steps.version_split.outputs._0 }}. \
-             ${{ steps.version_split.outputs._1 }}. \
-             ${{ steps.version_split_preview.outputs._0 }}- \
-             ${{ steps.version_split_preview.outputs._1 }}-
+             ${{ steps.version_split.outputs._0 }}.\
+             ${{ steps.version_split.outputs._1 }}.\
+             ${{ steps.version_split_preview.outputs._0 }}-\
+             ${{ steps.version_split_preview.outputs._1 }}-\
              $((${{ steps.version_split_preview.outputs._2 }} + 1))
