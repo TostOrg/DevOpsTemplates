@@ -25,7 +25,7 @@ jobs:
         uses: winterjung/split@v2
         id: version_split
         with:
-          msg: ${{ $Version }}
+          msg: ${{ Version }}
           separator: '.'
 
       - name: Split default Version
