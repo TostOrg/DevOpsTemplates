@@ -15,6 +15,7 @@ on:
       
 jobs:
   build:
+    if: ${{ vars.IS_DOT_NET_REPO }}
     runs-on: ubuntu-latest
     permissions:
       packages: write
