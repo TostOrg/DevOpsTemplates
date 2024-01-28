@@ -1,11 +1,12 @@
-name: Git Tag
+name: Git Tag PR
 
 on:
-  push:
+  pull_request:
+    types: [ "opened", "synchronize", "reopened" ]
     branches: [ "main" ]
 
 jobs:
-  build:
+  git-tag-pr:
     runs-on: ubuntu-latest
     permissions:
       contents: write
