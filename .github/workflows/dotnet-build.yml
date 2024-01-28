@@ -8,14 +8,12 @@ on:
   workflow_dispatch:
 
   push:
-    branches:
-      - '*'
     tags:
-      - 'v[0-9]+.[0-9]+.[0-9]+*'
+      - 'v**'
       
 jobs:
   build:
-    if: ${{ vars.IS_DOT_NET_REPO }}
+    if: ${{ vars.IS_DOT_NET_REPO == 'true' }}
     runs-on: ubuntu-latest
     permissions:
       packages: write
@@ -39,16 +37,16 @@ jobs:
         run: dotnet nuget add source --username ${{ secrets.NUGET_GITHUB_USERNAME }} --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/TostOrg/index.json"
 
       - name: Restore dependencies
-        run: dotnet restore --no-cache
+        run: dotnet restore "**/*.sln" --no-cache
 
       - name: Build
-        run: dotnet build --no-restore --configuration Release -p:Version=${{ env.Version }}
+        run: dotnet build "**/*.sln" --no-restore --configuration Release -p:Version=${{ env.Version }}
 
       - name: Test
-        run: dotnet test --no-build --configuration Release --verbosity normal -p:Version=${{ env.Version }}
+        run: dotnet test "**/*.sln" --no-build --configuration Release --verbosity normal -p:Version=${{ env.Version }}
 
       - name: Pack
-        run: dotnet pack --no-build --configuration Release --include-symbols --include-source -p:SymbolPackageFormat=${{ env.nuget_format }} -p:Version=${{ env.Version }} -o artifacts
+        run: dotnet pack "**/*.sln" --no-build --configuration Release --include-symbols --include-source -p:SymbolPackageFormat=${{ env.nuget_format }} -p:Version=${{ env.Version }} -o artifacts
 
       - name: Push
         run: dotnet nuget push "artifacts/*.${{ env.nuget_format }}" --source "github" -k ${{ secrets.GITHUB_TOKEN }} --no-service-endpoint
