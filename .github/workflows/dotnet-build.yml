@@ -44,8 +44,8 @@ jobs:
         run: dotnet test --no-build --configuration Release --verbosity normal -p:Version=${{ env.Version }}
 
       - name: Pack
-        run: dotnet pack --no-build --configuration Release --include-symbols --include-source -p:SymbolPackageFormat=${{ env.nuget_format }} -p:Version=${{ env.Version }}
+        run: dotnet pack --no-build --configuration Release --include-symbols --include-source -p:SymbolPackageFormat=${{ env.nuget_format }} -p:Version=${{ env.Version }} -o artifacts
 
       - name: Push
-        run: dotnet nuget push "bin/Release/${{ env.project_name }}.${{ env.Version }}.${{ env.nuget_format }}" --source "github" -k ${{ secrets.GITHUB_TOKEN }} --no-service-endpoint
+        run: dotnet nuget push "artifacts/*.${{ env.nuget_format }}" --source "github" -k ${{ secrets.GITHUB_TOKEN }} --no-service-endpoint
           
