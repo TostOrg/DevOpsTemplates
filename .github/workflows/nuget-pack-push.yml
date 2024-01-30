@@ -29,6 +29,7 @@ jobs:
 
       - name: Restore dependencies
         run: dotnet restore --no-cache
+        working-directory: artifact
     
       - name: Pack
         run: dotnet pack --no-build --configuration ${{ inputs.configuration }} --include-symbols --include-source -p:SymbolPackageFormat=${{ inputs.nuget_format }} -p:Version=${{ inputs.version }} -o artifacts
@@ -36,7 +37,7 @@ jobs:
         
       - name: Push
         run: dotnet nuget push --source github -k ${{ secrets.AUTH_TOKEN }} --no-service-endpoint --skip-duplicate
-        working-directory: artifacts
+        working-directory: artifact/artifacts
 
       - name: Cleanup
-        run: rm /artifacts/*
+        run: rm /artifact/artifacts/*
