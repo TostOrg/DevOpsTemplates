@@ -20,10 +20,9 @@ on:
         required: true
 
 jobs:
-  pack-and-push:
+  pack:
     runs-on: ubuntu-latest
     permissions:
-      packages: write
       contents: read
     steps:
       - name: Download a Build Artifact
@@ -40,16 +39,33 @@ jobs:
         run: dotnet pack --no-build --configuration ${{ inputs.configuration }} --include-symbols --include-source -p:SymbolPackageFormat=${{ inputs.nuget_format }} -p:Version=${{ inputs.version }} -o artifacts
         working-directory: artifact
 
+      - name: Upload the packed files
+        uses: actions/upload-artifact@v4.3.0
+        with:
+          name: nuget-packs
+          path: "./artifact"
+          if-no-files-found: error
+          overwrite: true
+
       - name: Finding files
-        run: |
-             {
-                echo 'FILELIST<<EOF'
-                find . -name '*.${{ inputs.nuget_format }}' -print 
-                echo EOF
-             } >> "$GITHUB_ENV"
+        working-directory: artifact
+        run: echo "files=$(find . -type f -name '*.log')" >> "$GITHUB_OUTPUT"
+
+  push:
+    needs: [ "pack" ]
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+    strategy:
+     matrix:
+       files: ${{ needs.pack.outputs.files }}
+    steps:
+      - name: Download the packed files
+        uses: actions/download-artifact@v4.1.1
+        with:
+          name: nuget-packs
              
-      - name: Do something with each file
-        run: |
-          for i in ${{ env.FILELIST }}; do
-            echo "dotnet nuget push ${i} --source github -k ${{ secrets.GITHUB_TOKEN }} --no-service-endpoint --skip-duplicate"
-          done
+      - name: Upload nuget packs
+        run: dotnet nuget push ${{ matrix.files }} --source github -k ${{ secrets.GITHUB_TOKEN }} --no-service-endpoint --skip-duplicate
+        working-directory: nuget-packs
