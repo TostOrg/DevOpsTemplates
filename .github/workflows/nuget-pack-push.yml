@@ -1,0 +1,29 @@
+on:
+  workflow_call:
+    secrets:
+      GITHUB_TOKEN:
+        required: true
+
+    inputs:
+      configuration:
+        type: string
+        default: Release
+      nuget_format:
+        type: string
+        default: snupkg
+
+jobs:
+  pack-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+    steps:
+      - name: Pack
+        run: dotnet pack "**/*.sln" --no-build --configuration ${{ inputs.configuration }} --include-symbols --include-source -p:SymbolPackageFormat=${{ inputs.nuget_format }} -p:Version=${{ inputs.version }} -o artifacts
+    
+      - name: Push
+        run: dotnet nuget push "artifacts/*.${{ inputs.nuget_format }}" --source github -k ${{ secrets.GITHUB_TOKEN }} --no-service-endpoint --skip-duplicate
+
+      - name: Cleanup
+        run: rm /artifacts/*

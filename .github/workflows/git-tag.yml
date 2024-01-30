@@ -1,0 +1,59 @@
+name: Git Tag
+
+on:
+  workflow_call:
+    secrets:
+      GITHUB_TOKEN:
+        required: true
+
+    inputs:
+      ref: 
+        required: true
+        type: string
+      if_check:
+        required: true
+        type: string
+      is_prerelease:
+        type: boolean
+      default_bump: 
+        type: string
+        default: patch
+      prerelease_suffix:
+        type: string
+      initial_version:
+        type: string
+        default: 1.0.0
+      with_v:
+        type: boolean
+        default: true
+
+    outputs:
+      tag:
+        description: Newly Created Tag
+        value: ${{ jobs.git_tag.outputs.tag }}
+
+jobs:
+  git_tag:
+    if: ${{ inputs.if_check == 'true' }}
+    runs-on: ubuntu-latest
+    outputs: 
+      tag: ${{ steps.step2.tag }}
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: '0'
+          ref: ${{ inputs.ref }}
+          
+      - name: Bump version and push tag
+        id: step2
+        uses: anothrNick/github-tag-action@1.67.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          WITH_V: ${{ inputs.with_v }}
+          PRERELEASE: ${{ inputs.is_prerelease }}
+          DEFAULT_BUMP: ${{ inputs.default_bump }}
+          INITIAL_VERSION: ${{ inputs.initial_version }}
+          PRERELEASE_SUFFIX: ${{ inputs.prerelease_suffix }}
