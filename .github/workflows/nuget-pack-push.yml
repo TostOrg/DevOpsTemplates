@@ -34,10 +34,20 @@ jobs:
       - name: Pack
         run: dotnet pack --no-build --configuration ${{ inputs.configuration }} --include-symbols --include-source -p:SymbolPackageFormat=${{ inputs.nuget_format }} -p:Version=${{ inputs.version }} -o artifacts
         working-directory: artifact
-        
-      - name: Push
-        run: dotnet nuget push --source github -k ${{ secrets.AUTH_TOKEN }} --no-service-endpoint --skip-duplicate
-        working-directory: artifact/artifacts
+
+      - name: Finding files
+        run: |
+             {
+                echo 'FILELIST<<EOF'
+                find . -name '*.${{ inputs.nuget_format }}' -print 
+                echo EOF
+             } >> "$GITHUB_ENV"
+             
+      - name: Do something with each file
+        run: |
+          for i in ${{ env.$FILELIST }}; do
+            echo "dotnet nuget push ${i} --source github -k ${{ secrets.GITHUB_TOKEN }} --no-service-endpoint --skip-duplicate"
+          done
 
       - name: Cleanup
         run: rm /artifact/artifacts/*
