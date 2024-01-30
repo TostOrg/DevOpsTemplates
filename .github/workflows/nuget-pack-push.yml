@@ -49,7 +49,7 @@ jobs:
 
       - name: Finding files
         working-directory: artifact/artifacts
-        run: echo "files=$(find . -type f -name '*.log')" >> "$GITHUB_OUTPUT"
+        run: echo "files=$(find . -type f -name '*.${{ inputs.nuget_format }}')" >> "$GITHUB_OUTPUT"
 
   push:
     needs: [ "pack" ]
