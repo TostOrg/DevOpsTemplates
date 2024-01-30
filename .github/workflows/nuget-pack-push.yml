@@ -25,7 +25,7 @@ jobs:
     permissions:
       contents: read
     outputs:
-      files: ${{ steps.find.outputs.arr }}
+      files: ${{ steps.find.outputs.files }}
     steps:
       - name: Download a Build Artifact
         uses: actions/download-artifact@v4.1.1
@@ -48,11 +48,12 @@ jobs:
           path: "./artifact/artifacts"
           if-no-files-found: error
           overwrite: true
-
-      - name: Finding files
+      - name: Find files matching "input.nuget_format"
+        uses: jeertmans/filesfinder@latest
         id: find
-        working-directory: artifact/artifacts
-        run: echo "IFS=' ' read -s -a arr <<< $(find . -type f -name '*.${{ inputs.nuget_format }}' -print0 | xargs -r0)" >> "$GITHUB_OUTPUT"
+        with:
+          args: "*.${{ inputs.nuget_format }}"
+          options: "-i --dir ./artifact/artifacts"
 
   push:
     needs: [ "pack" ]
