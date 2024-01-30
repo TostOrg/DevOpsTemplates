@@ -43,10 +43,10 @@ jobs:
         run: dotnet nuget add source --username ${{ secrets.NUGET_GITHUB_USERNAME }} --password ${{ secrets.AUTH_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/TostOrg/index.json"
     
       - name: Restore dependencies
-        run: dotnet restore "**/*.sln" --no-cache
+        run: dotnet restore --no-cache
     
       - name: Build
-        run: dotnet build "**/*.sln" --no-restore --configuration ${{ inputs.configuration }} -p:Version=${{ inputs.version }}
+        run: dotnet build --no-restore --configuration ${{ inputs.configuration }} -p:Version=${{ inputs.version }}
     
       - name: Test
-        run: dotnet test "**/*.sln" --no-build --configuration ${{ inputs.configuration }} --verbosity normal -p:Version=${{ inputs.version }}
+        run: dotnet test --no-build --configuration ${{ inputs.configuration }} --verbosity normal -p:Version=${{ inputs.version }}
