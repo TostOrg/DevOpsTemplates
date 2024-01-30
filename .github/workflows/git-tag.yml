@@ -10,9 +10,6 @@ on:
       ref: 
         required: true
         type: string
-      if_check:
-        required: true
-        type: string
       is_prerelease:
         type: boolean
       default_bump: 
@@ -34,7 +31,6 @@ on:
 
 jobs:
   git_tag:
-    if: ${{ inputs.if_check == 'true' }}
     runs-on: ubuntu-latest
     outputs: 
       tag: ${{ steps.step2.tag }}
