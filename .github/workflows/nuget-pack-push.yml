@@ -52,7 +52,7 @@ jobs:
       - name: Finding files
         id: find
         working-directory: artifact/artifacts
-        run: echo "arr=$(find . -type f -name '*.${{ inputs.nuget_format }}')" >> "$GITHUB_OUTPUT"
+        run: echo "IFS=' ' read -s -a arr <<< $(find . -type f -name '*.${{ inputs.nuget_format }}' -print0 | xargs -r0)" >> "$GITHUB_OUTPUT"
 
   push:
     needs: [ "pack" ]
