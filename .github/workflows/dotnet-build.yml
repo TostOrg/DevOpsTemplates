@@ -3,7 +3,7 @@ on:
     secrets:
       NUGET_GITHUB_USERNAME:
         required: true
-      GITHUB_TOKEN:
+      AUTH_TOKEN:
         required: true
 
     inputs:
@@ -38,7 +38,7 @@ jobs:
           dotnet-version: ${{ inputs.dotnet_version }}
     
       - name: Add Github nuget repo
-        run: dotnet nuget add source --username ${{ secrets.NUGET_GITHUB_USERNAME }} --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/TostOrg/index.json"
+        run: dotnet nuget add source --username ${{ secrets.NUGET_GITHUB_USERNAME }} --password ${{ secrets.AUTH_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/TostOrg/index.json"
     
       - name: Restore dependencies
         run: dotnet restore "**/*.sln" --no-cache

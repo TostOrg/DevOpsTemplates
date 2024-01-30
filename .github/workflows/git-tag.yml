@@ -3,7 +3,7 @@ name: Git Tag
 on:
   workflow_call:
     secrets:
-      GITHUB_TOKEN:
+      AUTH_TOKEN:
         required: true
 
     inputs:
@@ -51,7 +51,7 @@ jobs:
         id: step2
         uses: anothrNick/github-tag-action@1.67.0
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          AUTH_TOKEN: ${{ secrets.AUTH_TOKEN }}
           WITH_V: ${{ inputs.with_v }}
           PRERELEASE: ${{ inputs.is_prerelease }}
           DEFAULT_BUMP: ${{ inputs.default_bump }}
