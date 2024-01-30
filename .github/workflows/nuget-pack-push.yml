@@ -1,3 +1,5 @@
+name: Nuget Pack and Push
+
 on:
   workflow_call:
     secrets:
