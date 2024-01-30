@@ -24,6 +24,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+    outputs:
+      files: ${{ steps.find.outputs.arr }}
     steps:
       - name: Download a Build Artifact
         uses: actions/download-artifact@v4.1.1
@@ -48,8 +50,9 @@ jobs:
           overwrite: true
 
       - name: Finding files
+        id: find
         working-directory: artifact/artifacts
-        run: echo "files=$(find . -type f -name '*.${{ inputs.nuget_format }}')" >> "$GITHUB_OUTPUT"
+        run: echo "arr=$(find . -type f -name '*.${{ inputs.nuget_format }}')" >> "$GITHUB_OUTPUT"
 
   push:
     needs: [ "pack" ]
