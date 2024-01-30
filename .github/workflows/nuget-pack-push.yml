@@ -26,6 +26,9 @@ jobs:
     steps:
       - name: Download a Build Artifact
         uses: actions/download-artifact@v4.1.1
+
+      - name: Restore dependencies
+        run: dotnet restore --no-cache
     
       - name: Pack
         run: dotnet pack --no-build --configuration ${{ inputs.configuration }} --include-symbols --include-source -p:SymbolPackageFormat=${{ inputs.nuget_format }} -p:Version=${{ inputs.version }} -o artifacts
