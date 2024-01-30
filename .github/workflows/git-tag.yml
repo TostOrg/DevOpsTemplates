@@ -33,7 +33,7 @@ jobs:
   git_tag:
     runs-on: ubuntu-latest
     outputs: 
-      tag: ${{ steps.step2.outputs.new_tag#v }}
+      tag: ${{ env.VERSION }}
     permissions:
       contents: write
     steps:
@@ -53,3 +53,8 @@ jobs:
           DEFAULT_BUMP: ${{ inputs.default_bump }}
           INITIAL_VERSION: ${{ inputs.initial_version }}
           PRERELEASE_SUFFIX: ${{ inputs.prerelease_suffix }}
+
+      - name: Compute Version
+        run: |
+         TAG=${{ steps.step2.outputs.new_tag }}
+         echo "VERSION=${TAG#v}" >> $GITHUB_ENV
