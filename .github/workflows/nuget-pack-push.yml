@@ -13,6 +13,9 @@ on:
       nuget_format:
         type: string
         default: snupkg
+      version:
+        type: string
+        required: true
 
 jobs:
   pack-and-push:
