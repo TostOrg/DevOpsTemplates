@@ -33,7 +33,7 @@ jobs:
   git_tag:
     runs-on: ubuntu-latest
     outputs: 
-      tag: ${{ steps.step2.outputs.tag }}
+      tag: ${{ steps.step2.outputs.new_tag }}
     permissions:
       contents: write
     steps:
