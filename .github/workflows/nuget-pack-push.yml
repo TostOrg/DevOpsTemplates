@@ -5,6 +5,8 @@ on:
     secrets:
       AUTH_TOKEN:
         required: true
+      NUGET_GITHUB_USERNAME:
+        required: true
 
     inputs:
       configuration:
@@ -27,6 +29,9 @@ jobs:
       - name: Download a Build Artifact
         uses: actions/download-artifact@v4.1.1
 
+      - name: Add Github nuget repo
+        run: dotnet nuget add source --username ${{ secrets.NUGET_GITHUB_USERNAME }} --password ${{ secrets.AUTH_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/TostOrg/index.json"
+    
       - name: Restore dependencies
         run: dotnet restore --no-cache
         working-directory: artifact
@@ -46,8 +51,5 @@ jobs:
       - name: Do something with each file
         run: |
           for i in ${{ env.FILELIST }}; do
-            dotnet nuget push ${i} --source "https://nuget.pkg.github.com/TostOrg/index.json" -k ${{ secrets.GITHUB_TOKEN }} --no-service-endpoint --skip-duplicate
+            dotnet nuget push ${i} --source "github" -k ${{ secrets.GITHUB_TOKEN }} --no-service-endpoint --skip-duplicate
           done
-
-      - name: Cleanup
-        run: rm /artifact/artifacts/*
