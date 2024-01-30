@@ -41,9 +41,7 @@ jobs:
           dotnet-version: ${{ inputs.dotnet_version }}
     
       - name: Add Github nuget repo
-        run: |
-          dotnet nuget add source --username ${{ secrets.NUGET_GITHUB_USERNAME }} --password ${{ secrets.AUTH_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/TostOrg/index.json"
-          dotnet nuget add source --name nuget "https://api.nuget.org/v3/index.json"
+        run: dotnet nuget add source --username ${{ secrets.NUGET_GITHUB_USERNAME }} --password ${{ secrets.AUTH_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/TostOrg/index.json"
     
       - name: Restore dependencies
         run: dotnet restore --no-cache
