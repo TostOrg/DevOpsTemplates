@@ -32,7 +32,8 @@ jobs:
     
       - name: Pack
         run: dotnet pack --no-build --configuration ${{ inputs.configuration }} --include-symbols --include-source -p:SymbolPackageFormat=${{ inputs.nuget_format }} -p:Version=${{ inputs.version }} -o artifacts
-    
+        working-directory: artifact
+        
       - name: Push
         run: dotnet nuget push --source github -k ${{ secrets.AUTH_TOKEN }} --no-service-endpoint --skip-duplicate
         working-directory: artifacts
