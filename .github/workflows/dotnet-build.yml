@@ -21,6 +21,7 @@ on:
       configuration:
         type: string
         default: Release
+      
 
 jobs:
   build:
@@ -47,6 +48,16 @@ jobs:
     
       - name: Build
         run: dotnet build --no-restore --configuration ${{ inputs.configuration }} -p:Version=${{ inputs.version }}
+
+      - name: Test
+        run : ls -R
+
+      - name: Upload a Build Artifact
+        uses: actions/upload-artifact@v4.3.0
+        with:
+          path: ""
+          if-no-files-found: error
+          overwrite: true
     
       - name: Test
         run: dotnet test --no-build --configuration ${{ inputs.configuration }} --verbosity normal -p:Version=${{ inputs.version }}
