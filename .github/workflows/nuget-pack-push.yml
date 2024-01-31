@@ -47,5 +47,5 @@ jobs:
           nuget-version: 6.x
 
       - name: Push Nuget packs
-        run: nuget push '*.${{ inputs.nuget_format }}' -Source github -ApiKey ${{ secrets.GITHUB_TOKEN }} -NoServiceEndpoint -SkipDuplicate
+        run: nuget push '*.${{ inputs.nuget_format }}' -Source "github" -ApiKey ${{ secrets.GITHUB_TOKEN }} -NoServiceEndpoint -SkipDuplicate
         working-directory: artifact/artifacts
