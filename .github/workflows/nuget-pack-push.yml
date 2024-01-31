@@ -14,7 +14,7 @@ on:
         default: Release
       nuget_format:
         type: string
-        default: snupkg
+        default: nupkg
       version:
         type: string
         required: true
