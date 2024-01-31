@@ -18,6 +18,12 @@ on:
       version:
         type: string
         required: true
+      nuget_version:
+        type: string
+        default: 6.x
+      nuget_server:
+        type: string
+        default: "https://nuget.pkg.github.com/TostOrg/index.json"
 
 jobs:
   pack-and-push:
@@ -32,13 +38,20 @@ jobs:
       - name: Setup Nuget
         uses: NuGet/setup-nuget@v2
         with:
-          nuget-version: 6.x
+          nuget-version: ${{ inputs.nuget_version }}
 
       - name: Add Github nuget repo
-        run: nuget sources add -Username ${{ secrets.NUGET_GITHUB_USERNAME }} -Password ${{ secrets.AUTH_TOKEN }} -StorePasswordInClearText -Name github -Source "https://nuget.pkg.github.com/TostOrg/index.json"
+        run: nuget sources add -Username ${{ secrets.NUGET_GITHUB_USERNAME }} -Password ${{ secrets.AUTH_TOKEN }} -StorePasswordInClearText -Name github -Source ${{ inputs.nuget_server }}
+
+      - name: Cache
+        uses: actions/cache@v4
+        with:
+          path: .nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
+        
     
       - name: Restore dependencies
-        run: dotnet restore --no-cache
+        run: dotnet restore
         working-directory: artifact
     
       - name: Pack
