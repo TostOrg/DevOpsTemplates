@@ -44,7 +44,13 @@ jobs:
         run: dotnet nuget add source --username ${{ secrets.NUGET_GITHUB_USERNAME }} --password ${{ secrets.AUTH_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/TostOrg/index.json"
     
       - name: Restore dependencies
-        run: dotnet restore --no-cache
+        run: dotnet restore
+
+      - name: Cache
+        uses: actions/cache@v4
+        with:
+          path: .nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
     
       - name: Build
         run: dotnet build --no-restore --configuration ${{ inputs.configuration }} -p:Version=${{ inputs.version }}
