@@ -24,14 +24,18 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-    outputs:
-      files: ${{ steps.find.outputs.files }}
+      packages: write
     steps:
       - name: Download a Build Artifact
         uses: actions/download-artifact@v4.1.1
 
+      - name: Setup Nuget
+        uses: NuGet/setup-nuget@v2
+        with:
+          nuget-version: 6.x
+
       - name: Add Github nuget repo
-        run: dotnet nuget add source --username ${{ secrets.NUGET_GITHUB_USERNAME }} --password ${{ secrets.AUTH_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/TostOrg/index.json"
+        run: nuget sources add -Username ${{ secrets.NUGET_GITHUB_USERNAME }} -Password ${{ secrets.AUTH_TOKEN }} -StorePasswordInClearText -Name github -Source "https://nuget.pkg.github.com/TostOrg/index.json"
     
       - name: Restore dependencies
         run: dotnet restore --no-cache
@@ -40,11 +44,6 @@ jobs:
       - name: Pack
         run: dotnet pack --no-build --configuration ${{ inputs.configuration }} --include-symbols --include-source -p:SymbolPackageFormat=${{ inputs.nuget_format }} -p:Version=${{ inputs.version }} -o artifacts
         working-directory: artifact
-
-      - name: Setup Nuget
-        uses: NuGet/setup-nuget@v2
-        with:
-          nuget-version: 6.x
 
       - name: Push Nuget packs
         run: nuget push '*.${{ inputs.nuget_format }}' -Source "github" -ApiKey ${{ secrets.GITHUB_TOKEN }} -NoServiceEndpoint -SkipDuplicate
