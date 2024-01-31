@@ -42,8 +42,9 @@ jobs:
         working-directory: artifact
     
       - name: Pack
-        run: dotnet pack --no-build --configuration ${{ inputs.configuration }} --include-symbols --include-source -p:SymbolPackageFormat=${{ inputs.nuget_format }} -p:Version=${{ inputs.version }} -o artifacts
+        run: dotnet pack --no-build --configuration ${{ inputs.configuration }} --include-symbols --include-source -p:Version=${{ inputs.version }} -o artifacts
         working-directory: artifact
 
       - name: Push Nuget packs
-        run: nuget push artifact/artifacts/*.${{ inputs.nuget_format }} -Source "github" -ApiKey ${{ secrets.GITHUB_TOKEN }} -NoServiceEndpoint -SkipDuplicate
+        run: nuget push "*.${{ inputs.nuget_format }}" -Source "github" -ApiKey ${{ secrets.GITHUB_TOKEN }} -NoServiceEndpoint -SkipDuplicate
+        working-directory: artifact/artifacts/
