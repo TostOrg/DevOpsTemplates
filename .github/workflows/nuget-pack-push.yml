@@ -20,7 +20,7 @@ on:
         required: true
 
 jobs:
-  pack:
+  pack-and-push:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -41,35 +41,11 @@ jobs:
         run: dotnet pack --no-build --configuration ${{ inputs.configuration }} --include-symbols --include-source -p:SymbolPackageFormat=${{ inputs.nuget_format }} -p:Version=${{ inputs.version }} -o artifacts
         working-directory: artifact
 
-      - name: Upload the packed files
-        uses: actions/upload-artifact@v4.3.0
+      - name: Setup Nuget
+        uses: NuGet/setup-nuget@v2
         with:
-          name: nuget-packs
-          path: "./artifact/artifacts"
-          if-no-files-found: error
-          overwrite: true
-      - name: Find files matching "input.nuget_format"
-        uses: jeertmans/filesfinder@latest
-        id: find
-        with:
-          args: "*.${{ inputs.nuget_format }}"
-          options: "-i --dir ./artifact/artifacts"
+          nuget-version: 6.x
 
-  push:
-    needs: [ "pack" ]
-    runs-on: ubuntu-latest
-    permissions:
-      packages: write
-      contents: read
-    strategy:
-     matrix:
-       files: ${{ needs.pack.outputs.files }}
-    steps:
-      - name: Download the packed files
-        uses: actions/download-artifact@v4.1.1
-        with:
-          name: nuget-packs
-             
-      - name: Upload nuget packs
-        run: dotnet nuget push ${{ matrix.files }} --source github -k ${{ secrets.GITHUB_TOKEN }} --no-service-endpoint --skip-duplicate
-        working-directory: nuget-packs
+      - name: Push Nuget packs
+        run: nuget push '*.${{ inputs.nuget_format }}' -Source github -ApiKey ${{ secrets.GITHUB_TOKEN }} -NoServiceEndpoint -SkipDuplicate
+        working-directory: artifact/artifacts
