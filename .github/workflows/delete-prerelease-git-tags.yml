@@ -27,4 +27,4 @@ jobs:
           ref: ${{ inputs.ref }}
 
       - name: Delete Old Tags
-        run: git tag -l | grep ${{ inputs.branch_name }} | xargs git push --delete origin HEAD
+        run: git tag -l | grep ${{ inputs.branch_name }} | xargs git push --delete origin
