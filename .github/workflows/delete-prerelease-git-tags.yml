@@ -10,12 +10,6 @@ on:
       ref: 
         required: true
         type: string
-      delete_from_main:
-        type: boolean
-        required: false
-      delete_from_branches:
-        type: boolean
-        default: true
       branch_name:
         type: string
         required: true
