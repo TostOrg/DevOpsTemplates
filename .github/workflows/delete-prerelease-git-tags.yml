@@ -1,0 +1,36 @@
+name: Delete old Git Tags
+
+on:
+  workflow_call:
+    secrets:
+      AUTH_TOKEN:
+        required: true
+
+    inputs:
+      ref: 
+        required: true
+        type: string
+      delete_from_main:
+        type: boolean
+        required: false
+      delete_from_branches:
+        type: boolean
+        default: true
+      branch_name:
+        type: string
+        required: true
+
+jobs:
+  delete_tags:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: '0'
+          ref: ${{ inputs.ref }}
+
+      - name: Delete Old Tags
+        run: git tag -l | grep ${{ inputs.branch_name }} | xargs git push --delete origin HEAD
