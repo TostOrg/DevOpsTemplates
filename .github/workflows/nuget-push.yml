@@ -3,6 +3,10 @@ name: Nuget Push
 on:
   workflow_call:
     secrets:
+      AUTH_GITHUB_TOKEN:
+        required: true
+      NUGET_GITHUB_USERNAME:
+        required: true
       AUTH_TOKEN:
         required: true
 
@@ -21,7 +25,7 @@ jobs:
       packages: write
     steps:
       - name: Add Github nuget repo
-        run: nuget sources add -Username ${{ secrets.NUGET_USERNAME }} -Password ${{ secrets.AUTH_TOKEN }} -StorePasswordInClearText -Name github -Source "https://nuget.pkg.github.com/TostOrg/index.json"
+        run: nuget sources add -Username ${{ secrets.NUGET_GITHUB_USERNAME }} -Password ${{ secrets.AUTH_GITHUB_TOKEN }} -StorePasswordInClearText -Name github -Source "https://nuget.pkg.github.com/TostOrg/index.json"
 
       - name: Download Nuget Pack artifacts
         uses: actions/download-artifact@v4
