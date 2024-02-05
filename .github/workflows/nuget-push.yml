@@ -1,0 +1,33 @@
+name: Nuget Push
+
+on:
+  workflow_call:
+    secrets:
+      AUTH_TOKEN:
+        required: true
+
+    inputs:
+      nuget_format:
+        type: string
+        default: nupkg
+      nuget_server:
+        type: string
+        default: "github"
+  
+jobs:
+  push:
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+    steps:
+      - name: Add Github nuget repo
+        run: nuget sources add -Username ${{ secrets.NUGET_USERNAME }} -Password ${{ secrets.AUTH_TOKEN }} -StorePasswordInClearText -Name github -Source "https://nuget.pkg.github.com/TostOrg/index.json"
+
+      - name: Download Nuget Pack artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: nuget-packs
+
+      - name: Push Nuget packs
+        run: nuget push "*.${{ inputs.nuget_format }}" -Source ${{ inputs.nuget_server }} -ApiKey ${{ secrets.AUTH_TOKEN }} -NoServiceEndpoint -SkipDuplicate
+        working-directory: nuget-packs

@@ -58,6 +58,7 @@ jobs:
       - name: Upload a Build Artifact
         uses: actions/upload-artifact@v4.3.0
         with:
+          name: "build-artifact"
           path: "./"
           if-no-files-found: error
           overwrite: true

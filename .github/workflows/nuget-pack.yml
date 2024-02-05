@@ -1,0 +1,62 @@
+name: Nuget Pack
+
+on:
+  workflow_call:
+    secrets:
+      AUTH_TOKEN:
+        required: true
+      NUGET_USERNAME:
+        required: true
+
+    inputs:
+      configuration:
+        type: string
+        default: Release
+      version:
+        type: string
+        required: true
+      nuget_version:
+        type: string
+        default: 6.x
+
+jobs:
+  pack:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Download a Build Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifact
+
+      - name: Setup Nuget
+        uses: NuGet/setup-nuget@v2
+        with:
+          nuget-version: ${{ inputs.nuget_version }}
+
+      - name: Add Github nuget repo
+        run: nuget sources add -Username ${{ secrets.NUGET_USERNAME }} -Password ${{ secrets.AUTH_TOKEN }} -StorePasswordInClearText -Name github -Source "https://nuget.pkg.github.com/TostOrg/index.json"
+
+      - name: Cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
+        
+      - name: Restore dependencies
+        run: dotnet restore
+        working-directory: build-artifact
+    
+      - name: Pack
+        run: dotnet pack --no-build --configuration ${{ inputs.configuration }} --include-symbols --include-source -p:Version=${{ inputs.version }} -o output-packs
+        working-directory: build-artifact
+
+      - name: Upload Nuget Pack Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: "nuget-packs"
+          path: "./build-artifact/output-packs"
+          if-no-files-found: error
+          overwrite: true
