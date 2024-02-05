@@ -3,9 +3,9 @@ name: Nuget Pack
 on:
   workflow_call:
     secrets:
-      AUTH_TOKEN:
+      AUTH_GITHUB_TOKEN:
         required: true
-      NUGET_USERNAME:
+      NUGET_GITHUB_USERNAME:
         required: true
 
     inputs:
@@ -37,7 +37,7 @@ jobs:
           nuget-version: ${{ inputs.nuget_version }}
 
       - name: Add Github nuget repo
-        run: nuget sources add -Username ${{ secrets.NUGET_USERNAME }} -Password ${{ secrets.AUTH_TOKEN }} -StorePasswordInClearText -Name github -Source "https://nuget.pkg.github.com/TostOrg/index.json"
+        run: nuget sources add -Username ${{ secrets.NUGET_GITHUB_USERNAME }} -Password ${{ secrets.AUTH_GITHUB_TOKEN }} -StorePasswordInClearText -Name github -Source "https://nuget.pkg.github.com/TostOrg/index.json"
 
       - name: Cache
         uses: actions/cache@v4
